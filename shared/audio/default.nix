@@ -1,3 +1,4 @@
+{ pkgs, ... }:
 {
   xdg.configFile."pipewire/pipewire.conf.d/99-input-denoising.conf".text = builtins.toJSON {
     "context.modules" = [
@@ -11,7 +12,7 @@
               {
                 "type" = "ladspa";
                 "name" = "rnnoise";
-                "plugin" = "librnnoise_ladspa";
+                "plugin" = "${pkgs.rnnoise-plugin}/lib/ladspa/librnnoise_ladspa.so";
                 "label" = "noise_suppressor_stereo";
                 "control" = {
                   "VAD Threshold (%)" = 30.0;
