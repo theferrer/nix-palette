@@ -1,0 +1,145 @@
+{
+  config,
+  lib,
+  pkgs,
+  osConfig ? null,
+  ...
+}:
+let
+  themes = import ../themes;
+  conf = if osConfig != null then osConfig else config;
+  graphical = conf.canvas.resolved.graphical or false;
+  styleName = conf.canvas.style.name or null;
+  theme =
+    if styleName != null && themes ? ${styleName} then
+      themes.${styleName}
+    else
+      themes.${lib.head (lib.attrNames themes)};
+  gui = theme.gui or null;
+
+  cursorPackages = {
+    "catppuccin-mocha-dark-cursors" = pkgs.catppuccin-cursors.mochaDark;
+    "catppuccin-latte-light-cursors" = pkgs.catppuccin-cursors.latteLight;
+    "nordzy-cursors" = pkgs.nordzy-cursor-theme;
+    "Bibata-Modern-Classic" = pkgs.bibata-cursors;
+    "capitaine-cursors" = pkgs.capitaine-cursors;
+  };
+
+  iconPackages = {
+    "Papirus-Dark" = pkgs.papirus-icon-theme;
+    "Nordzy" = pkgs.nordzy-icon-theme;
+  };
+
+  gtkThemes = {
+    catppuccin-mocha = {
+      name = "catppuccin-mocha-pink-standard";
+      package = pkgs.catppuccin-gtk.override {
+        variant = "mocha";
+        accents = [ "pink" ];
+      };
+    };
+    nord = {
+      name = "Nordic";
+      package = pkgs.nordic;
+    };
+    gruvbox = {
+      name = "Gruvbox-Dark";
+      package = pkgs.gruvbox-gtk-theme;
+    };
+  };
+in
+lib.mkIf (graphical && gui != null) {
+  home = {
+    pointerCursor = {
+      inherit (gui.cursor) name size;
+      gtk.enable = true;
+      x11.enable = true;
+      package = cursorPackages.${gui.cursor.name} or pkgs.vanilla-dmz;
+    };
+
+    packages = [ pkgs.glib ];
+
+    sessionVariables = {
+
+      GTK_USE_PORTAL = "1";
+
+      QT_AUTO_SCREEN_SCALE_FACTOR = "1";
+
+      QT_QPA_PLATFORM = "wayland;xcb";
+      QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
+      DISABLE_QT5_COMPAT = "0";
+      CALIBRE_USE_DARK_PALETTE = "1";
+      QT_ICON_THEME = gui.icons.name;
+    };
+  };
+
+  xdg.systemDirs.data =
+    let
+      schema = pkgs.gsettings-desktop-schemas;
+    in
+    [ "${schema}/share/gsettings-schemas/${schema.name}" ];
+
+  gtk = {
+    enable = true;
+    gtk4.theme = null;
+
+    font = {
+      inherit (gui.font) name size;
+    };
+
+    theme = gtkThemes.${gui.gtkTheme} or null;
+
+    iconTheme = {
+      inherit (gui.icons) name;
+      package = iconPackages.${gui.icons.name} or pkgs.adwaita-icon-theme;
+    };
+
+    gtk2 = {
+      configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
+      extraConfig = ''
+        gtk-xft-antialias=1
+        gtk-xft-hinting=1
+        gtk-xft-hintstyle="hintslight"
+        gtk-xft-rgba="rgb"
+      '';
+    };
+
+    gtk3.extraConfig = {
+      gtk-application-prefer-dark-theme = true;
+      gtk-decoration-layout = "appmenu:none";
+
+      gtk-xft-antialias = 1;
+      gtk-xft-hinting = 1;
+      gtk-xft-hintstyle = "hintslight";
+
+      gtk-enable-event-sounds = 0;
+      gtk-enable-input-feedback-sounds = 0;
+      gtk-error-bell = 0;
+
+      gtk-toolbar-style = "GTK_TOOLBAR_BOTH";
+      gtk-toolbar-icon-size = "GTK_ICON_SIZE_LARGE_TOOLBAR";
+
+      gtk-button-images = 1;
+      gtk-menu-images = 1;
+    };
+
+    gtk4.extraConfig = {
+      gtk-application-prefer-dark-theme = true;
+      gtk-decoration-layout = "appmenu:none";
+
+      gtk-xft-antialias = 1;
+      gtk-xft-hinting = 1;
+      gtk-xft-hintstyle = "hintslight";
+
+      gtk-enable-event-sounds = 0;
+      gtk-enable-input-feedback-sounds = 0;
+      gtk-error-bell = 0;
+    };
+  };
+
+  qt = {
+    enable = true;
+    platformTheme.name = "kvantum";
+    style.name = "kvantum";
+  };
+}

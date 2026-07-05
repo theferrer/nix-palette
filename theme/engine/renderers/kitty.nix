@@ -1,0 +1,22 @@
+c: ''
+  foreground ${c.foreground}
+  background ${c.background}
+  selection_background ${c.selection}
+  cursor ${c.cursor}
+  color0 ${c.base01}
+  color1 ${c.base08}
+  color2 ${c.base0B}
+  color3 ${c.base0A}
+  color4 ${c.base0D}
+  color5 ${c.base0E}
+  color6 ${c.base0C}
+  color7 ${c.base05}
+  color8 ${c.base03}
+  color9 ${c.base08}
+  color10 ${c.base0B}
+  color11 ${c.base0A}
+  color12 ${c.base0D}
+  color13 ${c.base0E}
+  color14 ${c.base0C}
+  color15 ${c.base06}
+''
