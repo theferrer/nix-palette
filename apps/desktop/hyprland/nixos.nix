@@ -20,5 +20,11 @@ in
 lib.mkIf (canvasLib.isActive config "hyprland") {
   programs.hyprland.enable = lib.mkDefault true;
   programs.uwsm.enable = true;
-  services.displayManager.sessionPackages = [ hyprlandUwsmSession ];
+
+  # Expose ONLY the uwsm-managed session to the greeter. The raw
+  # hyprland.desktop (added unconditionally by programs.hyprland) does not
+  # start graphical-session.target, so user services with
+  # WantedBy=graphical-session.target (dms bar/launcher/wallpaper) never
+  # activate when it is picked.
+  services.displayManager.sessionPackages = lib.mkForce [ hyprlandUwsmSession ];
 }
