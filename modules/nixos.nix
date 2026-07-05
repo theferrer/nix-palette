@@ -19,6 +19,7 @@ in
     ../shared/console.nix
     ../shared/fonts.nix
     ../shared/portals.nix
+    ../shared/power.nix
   ];
 
   canvas.catalog = import ../catalog {

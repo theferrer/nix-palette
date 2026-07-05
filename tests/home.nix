@@ -11,6 +11,7 @@ let
       canvas.homeModules.default
       (import ../modules/home.nix { })
       ../theme/engine
+      ../apps/terminals/kitty/home
       {
         home = {
           username = "tester";
@@ -59,8 +60,8 @@ in
     };
   };
 
-  testKittyIncludesLiveTheme = {
-    expr = !active "kitty" || lib.hasInfix "theme/current/kitty.conf" cfg.programs.kitty.extraConfig;
+  testKittyIncludesMatugenTheme = {
+    expr = !active "kitty" || lib.hasInfix "kitty/dank-theme.conf" cfg.programs.kitty.extraConfig;
     expected = true;
   };
 

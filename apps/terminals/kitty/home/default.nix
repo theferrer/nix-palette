@@ -9,6 +9,11 @@
       enableZshIntegration = config.programs.zsh.enable;
     };
 
+    font = {
+      name = "GeistMono Nerd Font";
+      size = 11;
+    };
+
     settings = {
       background_opacity = "0.80";
       url_style = "double";
@@ -17,6 +22,14 @@
       enable_audio_bell = false;
       window_padding_width = 12;
     };
+
+    # Colors come from DankMaterialShell's matugen run (regenerated from the
+    # wallpaper); the files are written on theme change and don't exist until
+    # then, which kitty tolerates with a warning.
+    extraConfig = ''
+      include ${config.xdg.configHome}/kitty/dank-theme.conf
+      include ${config.xdg.configHome}/kitty/dank-tabs.conf
+    '';
 
     keybindings = {
       "ctrl+c" = "copy_or_interrupt";

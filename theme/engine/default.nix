@@ -83,17 +83,8 @@ in
 
   xdg.dataFile = lib.mkMerge (lib.mapAttrsToList fragmentsFor themes);
 
-  programs.kitty = {
-    extraConfig = lib.mkIf (active ? kitty) "include ${currentDir}/kitty.conf";
-
-    font =
-      let
-        guiFont = (themes.${defaultTheme}.gui or { }).font or null;
-      in
-      lib.mkIf (active ? kitty && guiFont != null) {
-        inherit (guiFont) name size;
-      };
-  };
+  # kitty, hyprland and gtk colours are owned by DankMaterialShell's matugen
+  # run (regenerated from the wallpaper), not by static fragments.
 
   home.activation.canvasThemeLink = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
     link="${currentDir}"

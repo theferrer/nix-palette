@@ -10,7 +10,11 @@ let
   styleName = config.canvas.style.name or null;
   themeName =
     if styleName != null && themes ? ${styleName} then styleName else lib.head (lib.attrNames themes);
-  inherit (themes.${themeName}) colors;
+  colors = import ../../../theme/boot-palette.nix {
+    inherit pkgs;
+    inherit (themes.${themeName}) wallpaper;
+    name = themeName;
+  };
 
   # Plymouth's script API takes 0-1 floats per channel.
   channel = hex: i: lib.fromHexString (builtins.substring i 2 hex);

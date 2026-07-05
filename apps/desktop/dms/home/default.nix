@@ -85,6 +85,8 @@ in
       gtkThemingEnabled = true;
       qtThemingEnabled = true;
       runUserMatugenTemplates = true;
+      matugenTemplateKitty = true;
+      terminalsAlwaysDark = true;
 
       use24HourClock = true;
       showSeconds = false;

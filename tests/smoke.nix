@@ -169,7 +169,7 @@ in
       implies "hyprland" (
         lib.any (line: lib.hasPrefix monitorPrefix line) settings.monitor
         && lib.any (b: lib.hasInfix (exeFor "terminal") b) settings.bind
-        && lib.any (src: lib.hasSuffix "theme/current/hyprland.conf" src) settings.source
+        && lib.any (src: lib.hasSuffix "hypr/dms/colors.conf" src) settings.source
         && settings.input.kb_layout == cfg.canvas.hardware.keyboard.layout
         && (cfg.canvas.machine.formFactor != "laptop" || hm.systemd.user.services ? hyprland-power-monitor)
       );

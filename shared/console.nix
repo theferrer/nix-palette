@@ -10,7 +10,11 @@ let
   styleName = config.canvas.style.name or null;
   themeName =
     if styleName != null && themes ? ${styleName} then styleName else lib.head (lib.attrNames themes);
-  inherit (themes.${themeName}) colors;
+  colors = import ../theme/boot-palette.nix {
+    inherit pkgs;
+    inherit (themes.${themeName}) wallpaper;
+    name = themeName;
+  };
 
   hex = c: builtins.substring 1 6 colors.${c};
 in
