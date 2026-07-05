@@ -1,0 +1,20 @@
+{
+  imports = [
+    ./animations.nix
+    ./binds.nix
+    ./decorations.nix
+    ./env.nix
+    ./exec.nix
+    ./extra.nix
+    ./general.nix
+    ./group.nix
+    ./inputs.nix
+    ./layout.nix
+    ./misc.nix
+    ./monitor.nix
+    ./render.nix
+    ./theme.nix
+    ./tools.nix
+    ./windowrules.nix
+  ];
+}
