@@ -4,8 +4,8 @@
 
     focus_removed_window = true;
 
-    "col.border_active" = "$pink";
-    "col.border_inactive" = "$surface1";
+    # Group border colours come from the matugen-generated
+    # ~/.config/hypr/dms/colors.conf sourced in theme.nix.
 
     groupbar = {
       gradients = false;
