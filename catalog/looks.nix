@@ -10,7 +10,7 @@
       screen-locker = "dms";
       terminal = "kitty";
       editor = "nvim";
-      browser = "firefox";
+      browser = "chrome";
       shell = "fish";
       file-manager = "nemo";
       screenshot = "hyprshot";
