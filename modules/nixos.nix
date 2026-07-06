@@ -16,6 +16,7 @@ let
 in
 {
   imports = appGlue ++ [
+    ../shared/audio/nixos.nix
     ../shared/console.nix
     ../shared/fonts.nix
     ../shared/portals.nix
