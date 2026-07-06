@@ -93,6 +93,7 @@ let
   desktopFiles = {
     firefox = "firefox.desktop";
     chromium = "chromium.desktop";
+    chrome = "google-chrome.desktop";
     google-chrome = "google-chrome.desktop";
     brave = "brave-browser.desktop";
     vivaldi = "vivaldi-stable.desktop";
