@@ -513,6 +513,70 @@
     software = [ "asusctl" ];
   };
 
+  # Terminal toys, ASCII art, fetch novelties and small games. Standalone -
+  # add "toys" to a host's wants to install them.
+  toys = {
+    description = "Terminal toys, ASCII art and small games.";
+    software = [
+      # classics
+      "cmatrix"
+      "cowsay"
+      "nyancat"
+      "pipes"
+      "sl"
+      "fortune"
+      "lolcat"
+      "asciiquarium"
+      "dotacat"
+      # visuals and novelty
+      "cbonsai"
+      "pipes-rs"
+      "unimatrix"
+      "neo"
+      "tmatrix"
+      "hollywood"
+      "genact"
+      "terminal-parrot"
+      "gay"
+      "rig"
+      "oneko"
+      "xcowsay"
+      # ascii art and text
+      "figlet"
+      "toilet"
+      "boxes"
+      "banner"
+      "ponysay"
+      "neo-cowsay"
+      "charasay"
+      # sprites
+      "krabby"
+      "pokemonsay"
+      # fetch toys
+      "pfetch"
+      "nerdfetch"
+      "cpufetch"
+      "starfetch"
+      "nitch"
+      "macchina"
+      "owofetch"
+      # games
+      "nsnake"
+      "ninvaders"
+      "moon-buggy"
+      "vitetris"
+      "bastet"
+      "2048"
+      "nudoku"
+      "greed"
+      "freesweep"
+      "nethack"
+      "crawl"
+      "angband"
+      "gnugo"
+    ];
+  };
+
   graphics-tools = {
     description = "GPU diagnostics and benchmarks (vendor-neutral).";
     software = [
