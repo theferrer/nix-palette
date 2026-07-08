@@ -4,7 +4,11 @@
     package = pkgs.amule;
   };
   google-cloud-sdk = {
-    package = pkgs.google-cloud-sdk;
+    # kubectl talks to GKE through gke-gcloud-auth-plugin, a separate SDK
+    # component gcloud no longer bundles; without it kubectl auth fails.
+    package = pkgs.google-cloud-sdk.withExtraComponents [
+      pkgs.google-cloud-sdk.components.gke-gcloud-auth-plugin
+    ];
   };
   nmap = {
     package = pkgs.nmap;
