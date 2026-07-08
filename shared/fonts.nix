@@ -30,7 +30,8 @@ lib.mkIf (canvasLib.isGraphical config) {
         ;
       inherit (pkgs.nerd-fonts) symbols-only space-mono;
       inherit (palettePkgs) sf-pro quickshell-fonts;
-    };
+    }
+    ++ [ pkgs.nerd-fonts.jetbrains-mono ];
 
     fontconfig = {
       enable = true;

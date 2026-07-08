@@ -20,7 +20,7 @@
 
       window-save-state = "always";
 
-      font-family = "JetBrains Mono";
+      font-family = "JetBrainsMono Nerd Font";
       font-size = 12;
 
       link-url = true;

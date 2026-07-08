@@ -90,6 +90,9 @@ in
 
       use24HourClock = true;
       showSeconds = false;
+
+      fontFamily = "Inter Variable";
+      monoFontFamily = "JetBrainsMono Nerd Font";
     };
 
     session = { };

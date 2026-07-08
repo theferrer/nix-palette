@@ -4,7 +4,7 @@
     wallpaper = ./synthppuccin/wallpaper.jpg;
     gui = {
       font = {
-        name = "GeistMono Nerd Font";
+        name = "Inter";
         size = 11;
       };
       cursor = {
