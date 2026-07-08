@@ -128,6 +128,9 @@
   codex = {
     package = pkgs.codex;
   };
+  herdr = {
+    package = pkgs.herdr;
+  };
 
   kubectl = {
     package = pkgs.kubectl;

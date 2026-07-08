@@ -110,6 +110,7 @@
       "claude-code"
       "opencode"
       "codex"
+      "herdr"
       "wakatime-cli"
       "git-credential-manager"
       "httpie"
