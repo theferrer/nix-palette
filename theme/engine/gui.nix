@@ -34,6 +34,7 @@ in
 lib.mkIf (graphical && gui != null) {
   home = {
     pointerCursor = {
+      enable = true;
       inherit (gui.cursor) name size;
       gtk.enable = true;
       x11.enable = true;
