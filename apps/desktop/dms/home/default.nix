@@ -19,7 +19,7 @@ in
 
     settings = {
 
-      cornerRadius = 0;
+      cornerRadius = 12;
 
       barConfigs = [
         {
@@ -30,10 +30,10 @@ in
           screenPreferences = [ "all" ];
           showOnLastDisplay = true;
 
-          bottomGap = 0;
-          squareCorners = true;
-          spacing = 0;
-          innerPadding = 0;
+          bottomGap = 6;
+          squareCorners = false;
+          spacing = 4;
+          innerPadding = 6;
 
           autoHide = true;
           autoHideDelay = 250;
@@ -61,11 +61,16 @@ in
           ++ lib.optional isLaptop "battery"
           ++ [ "controlCenterButton" ];
 
-          transparency = 1;
-          widgetTransparency = 1;
+          # transparency is really the background opacity (withAlpha on the
+          # matugen surface); < 1 lets the wallpaper through for some depth.
+          transparency = 0.85;
+          widgetTransparency = 0.9;
           noBackground = false;
           borderEnabled = false;
-          widgetOutlineEnabled = false;
+          widgetOutlineEnabled = true;
+          widgetOutlineColor = "primary";
+          widgetOutlineOpacity = 0.35;
+          widgetOutlineThickness = 1;
           gothCornersEnabled = false;
           fontScale = 1;
           popupGapsAuto = true;
