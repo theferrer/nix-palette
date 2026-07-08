@@ -90,8 +90,6 @@
       "lnav"
       "lazyjournal"
       "angle-grinder"
-      "chezmoi"
-      "topgrade"
       "kalker"
       "buku"
       "timewarrior"

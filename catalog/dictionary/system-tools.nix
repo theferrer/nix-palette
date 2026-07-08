@@ -275,10 +275,6 @@
   lazyjournal.package = pkgs.lazyjournal;
   angle-grinder.package = pkgs.angle-grinder;
 
-  # Dotfiles and maintenance
-  chezmoi.package = pkgs.chezmoi;
-  topgrade.package = pkgs.topgrade;
-
   # Productivity and misc
   kalker.package = pkgs.kalker;
   buku.package = pkgs.buku;
