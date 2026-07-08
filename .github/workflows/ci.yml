@@ -1,10 +1,12 @@
-# While the stack is private, this repo's checks run from nix-dotfiles' CI
-# (its `palette` job checks this repo out with a read-only token - the
-# palette's own runner cannot fetch the private canvas input). Manual runs
-# stay available; restore the push/pull_request triggers on publication.
+# Public repo: checks run on every push and PR. All inputs (nix-canvas,
+# nixpkgs, home-manager, ...) are public; the built-in GITHUB_TOKEN lifts
+# nix's anonymous GitHub API rate limit.
 name: CI
 
 on:
+  push:
+    branches: [main]
+  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -13,4 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22
+        with:
+          extra-conf: |
+            access-tokens = github.com=${{ github.token }}
       - run: nix flake check
