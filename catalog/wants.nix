@@ -64,6 +64,40 @@
       "taskwarrior"
       "khal"
       "rclone"
+      "sd"
+      "entr"
+      "watchexec"
+      "mprocs"
+      "pueue"
+      "navi"
+      "broot"
+      "fx"
+      "gron"
+      "jc"
+      "fq"
+      "television"
+      "pandoc"
+      "graphviz"
+      "presenterm"
+      "croc"
+      "magic-wormhole"
+      "termscp"
+      "asciinema"
+      "vhs"
+      "onefetch"
+      "glances"
+      "trippy"
+      "lnav"
+      "lazyjournal"
+      "angle-grinder"
+      "chezmoi"
+      "topgrade"
+      "kalker"
+      "buku"
+      "timewarrior"
+      "ttyd"
+      "gpg-tui"
+      "dooit"
     ];
   };
 
@@ -124,6 +158,34 @@
       "zk"
       "android-tools"
       "comma"
+      "difftastic"
+      "git-cliff"
+      "git-absorb"
+      "gitleaks"
+      "jujutsu"
+      "glab"
+      "meld"
+      "xh"
+      "curlie"
+      "grpcurl"
+      "websocat"
+      "oha"
+      "hey"
+      "atac"
+      "mkcert"
+      "scc"
+      "dasel"
+      "miller"
+      "sqlite"
+      "sqlite-utils"
+      "usql"
+      "pgcli"
+      "harlequin"
+      "lazysql"
+      "beekeeper-studio"
+      "mods"
+      "aichat"
+      "tgpt"
     ];
   };
 
@@ -148,6 +210,16 @@
       "google-cloud-sdk"
       "lens"
       "podman-desktop"
+      "k9s"
+      "kubectx"
+      "stern"
+      "dive"
+      "skopeo"
+      "helmfile"
+      "kustomize"
+      "trivy"
+      "grype"
+      "syft"
     ];
   };
 
@@ -177,6 +249,7 @@
       "virt-manager"
       "podman-compose"
       "virt-viewer"
+      "gnome-boxes"
     ];
   };
 
@@ -209,6 +282,9 @@
       "blanket"
       "ffmpeg-full"
       "v4l-utils"
+      "freetube"
+      "spotify-player"
+      "ncspot"
     ];
   };
 
@@ -222,6 +298,7 @@
       "wireguard"
       "protonvpn-gui"
       "networkmanager-openvpn"
+      "filezilla"
     ];
   };
 
@@ -233,6 +310,9 @@
       "xournalpp"
       "zotero"
       "calibre"
+      "foliate"
+      "marktext"
+      "apostrophe"
     ];
   };
 
@@ -288,6 +368,8 @@
       "blueman"
       "pavucontrol"
       "pulsemixer"
+      "helvum"
+      "qpwgraph"
     ];
   };
 
@@ -315,6 +397,8 @@
       "bolt"
       "cpupower"
       "tpm2-pkcs11"
+      "czkawka"
+      "pika-backup"
     ];
   };
 
@@ -352,7 +436,10 @@
 
   desktop-utils = {
     description = "Small desktop helpers.";
-    software = [ "yazi" ];
+    software = [
+      "yazi"
+      "keepassxc"
+    ];
   };
 
   session-services = {
@@ -372,6 +459,54 @@
     software = [
       "apparmor"
       "fail2ban"
+    ];
+  };
+
+  # Opt-in offensive/analysis toolkit. Standalone (not pulled by `system`);
+  # add "security-tools" to a host's wants. The heavyweights (metasploit,
+  # ghidra, seclists) stay out of here - add them per host via `extra`.
+  security-tools = {
+    description = "Recon, web, network, cracking and RE tooling for security work.";
+    software = [
+      "masscan"
+      "rustscan"
+      "amass"
+      "subfinder"
+      "dnsx"
+      "dnsrecon"
+      "gobuster"
+      "ffuf"
+      "feroxbuster"
+      "wfuzz"
+      "nuclei"
+      "httpx"
+      "katana"
+      "whatweb"
+      "nikto"
+      "sqlmap"
+      "arjun"
+      "gau"
+      "tcpdump"
+      "tshark"
+      "ngrep"
+      "mitmproxy"
+      "bettercap"
+      "responder"
+      "hashcat"
+      "john"
+      "thc-hydra"
+      "medusa"
+      "aircrack-ng"
+      "hcxtools"
+      "hcxdumptool"
+      "testssl"
+      "sslscan"
+      "radare2"
+      "binwalk"
+      "yara"
+      "trufflehog"
+      "proxychains-ng"
+      "netexec"
     ];
   };
 

@@ -33,4 +33,5 @@
     package = pkgs.file-roller;
   };
   ffmpegthumbnailer.package = pkgs.ffmpegthumbnailer;
+  czkawka.package = pkgs.czkawka;
 }

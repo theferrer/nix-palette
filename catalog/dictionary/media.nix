@@ -90,4 +90,6 @@
   };
   davinci-resolve-studio.package = pkgs.davinci-resolve-studio;
   ffmpeg-full.package = pkgs.ffmpeg-full;
+  helvum.package = pkgs.helvum;
+  qpwgraph.package = pkgs.qpwgraph;
 }

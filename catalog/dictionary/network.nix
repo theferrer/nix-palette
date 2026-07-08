@@ -83,4 +83,5 @@
     package = pkgs.termshark;
   };
   syncthingtray.package = pkgs.syncthingtray;
+  filezilla.package = pkgs.filezilla;
 }

@@ -12,4 +12,8 @@
   mangal = {
     package = pkgs.mangal;
   };
+
+  spotify-player.package = pkgs.spotify-player;
+  ncspot.package = pkgs.ncspot;
+  television.package = pkgs.television;
 }

@@ -239,4 +239,51 @@
   poppler-utils.package = pkgs.poppler-utils;
   fontpreview.package = pkgs.fontpreview;
   upower.package = pkgs.upower;
+
+  # Modern CLI replacements and helpers
+  sd.package = pkgs.sd;
+  entr.package = pkgs.entr;
+  watchexec.package = pkgs.watchexec;
+  mprocs.package = pkgs.mprocs;
+  pueue.package = pkgs.pueue;
+  navi.package = pkgs.navi;
+  broot.package = pkgs.broot;
+  fx.package = pkgs.fx;
+  gron.package = pkgs.gron;
+  jc.package = pkgs.jc;
+  fq.package = pkgs.fq;
+
+  # Docs and rendering
+  pandoc.package = pkgs.pandoc;
+  graphviz.package = pkgs.graphviz;
+  presenterm.package = pkgs.presenterm;
+
+  # Transfer and sync
+  croc.package = pkgs.croc;
+  magic-wormhole.package = pkgs.magic-wormhole;
+  termscp.package = pkgs.termscp;
+
+  # Recording and demos
+  asciinema.package = pkgs.asciinema;
+  vhs.package = pkgs.vhs;
+  onefetch.package = pkgs.onefetch;
+
+  # Monitoring and inspection
+  glances.package = pkgs.glances;
+  trippy.package = pkgs.trippy;
+  lnav.package = pkgs.lnav;
+  lazyjournal.package = pkgs.lazyjournal;
+  angle-grinder.package = pkgs.angle-grinder;
+
+  # Dotfiles and maintenance
+  chezmoi.package = pkgs.chezmoi;
+  topgrade.package = pkgs.topgrade;
+
+  # Productivity and misc
+  kalker.package = pkgs.kalker;
+  buku.package = pkgs.buku;
+  timewarrior.package = pkgs.timewarrior;
+  ttyd.package = pkgs.ttyd;
+  gpg-tui.package = pkgs.gpg-tui;
+  dooit.package = pkgs.dooit;
 }

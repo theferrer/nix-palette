@@ -163,4 +163,54 @@
   intelephense.package = pkgs.intelephense;
   android-tools.package = pkgs.android-tools;
   nosqlbooster4mongo.package = pkgs.nosqlbooster4mongo;
+
+  # Git and VCS
+  difftastic.package = pkgs.difftastic;
+  git-cliff.package = pkgs.git-cliff;
+  git-absorb.package = pkgs.git-absorb;
+  gitleaks.package = pkgs.gitleaks;
+  jujutsu.package = pkgs.jujutsu;
+  glab.package = pkgs.glab;
+  meld.package = pkgs.meld;
+
+  # Kubernetes and containers
+  k9s.package = pkgs.k9s;
+  kubectx.package = pkgs.kubectx;
+  stern.package = pkgs.stern;
+  dive.package = pkgs.dive;
+  skopeo.package = pkgs.skopeo;
+  helmfile.package = pkgs.helmfile;
+  kustomize.package = pkgs.kustomize;
+  trivy.package = pkgs.trivy;
+  grype.package = pkgs.grype;
+  syft.package = pkgs.syft;
+
+  # HTTP, API and load
+  xh.package = pkgs.xh;
+  curlie.package = pkgs.curlie;
+  grpcurl.package = pkgs.grpcurl;
+  websocat.package = pkgs.websocat;
+  oha.package = pkgs.oha;
+  hey.package = pkgs.hey;
+  atac.package = pkgs.atac;
+
+  # Databases
+  sqlite.package = pkgs.sqlite;
+  sqlite-utils.package = pkgs.sqlite-utils;
+  usql.package = pkgs.usql;
+  pgcli.package = pkgs.pgcli;
+  harlequin.package = pkgs.harlequin;
+  lazysql.package = pkgs.lazysql;
+  beekeeper-studio.package = pkgs.beekeeper-studio;
+
+  # Data wrangling and misc
+  dasel.package = pkgs.dasel;
+  miller.package = pkgs.miller;
+  scc.package = pkgs.scc;
+  mkcert.package = pkgs.mkcert;
+
+  # Terminal AI helpers
+  mods.package = pkgs.mods;
+  aichat.package = pkgs.aichat;
+  tgpt.package = pkgs.tgpt;
 }
