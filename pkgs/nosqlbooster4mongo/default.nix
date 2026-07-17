@@ -6,10 +6,12 @@
 }:
 let
   pname = "nosqlbooster4mongo";
-  version = "10.0.0";
+  version = "11.0.5";
+  # Upstream added an arch suffix and only keeps the latest patch published; the
+  # old releasesv10/...-10.0.0.AppImage URL now 404s. Filename is now -x64.
   src = pkgs.fetchurl {
-    url = "https://s3.nosqlbooster.com/download/releasesv${lib.versions.major version}/nosqlbooster4mongo-${version}.AppImage";
-    hash = "sha256-HjQgcg7tG8J7bizvEy32N3/e6ybBQO0XISUdCuGi6SM=";
+    url = "https://s3.nosqlbooster.com/download/releasesv${lib.versions.major version}/nosqlbooster4mongo-${version}-x64.AppImage";
+    hash = "sha256-OOIA95CZugtOIjV45QeKcZ4NbG9JZh7DAR61gFnxFlE=";
   };
   meta = {
     homepage = "https://nosqlbooster.com/";
