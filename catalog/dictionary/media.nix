@@ -75,6 +75,9 @@
   jellyfin = {
     package = pkgs.jellyfin;
   };
+  plex-desktop = {
+    package = pkgs.plex-desktop;
+  };
   spicetify = {
     package = pkgs.spicetify-cli;
   };

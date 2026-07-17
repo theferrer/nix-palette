@@ -283,6 +283,7 @@
       "freetube"
       "spotify-player"
       "ncspot"
+      "plex-desktop"
     ];
   };
 
