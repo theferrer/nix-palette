@@ -30,9 +30,12 @@ in
           screenPreferences = [ "all" ];
           showOnLastDisplay = true;
 
-          bottomGap = 6;
-          squareCorners = false;
-          spacing = 4;
+          # Barra encajada arriba: sin gap con los bordes (spacing=0), sin
+          # reserva extra de zona exclusiva (bottomGap=0) y esquinas rectas.
+          # Así queda a ras del borde superior y se aprovechan esos píxeles.
+          bottomGap = 0;
+          squareCorners = true;
+          spacing = 0;
           innerPadding = 6;
 
           autoHide = true;
