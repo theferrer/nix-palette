@@ -18,21 +18,29 @@ let
   nvidiaForDisplay = primaryVendor == "nvidia";
   multiGpu = builtins.length gpus > 1;
 
-  # "PCI:12:0:0" (Xorg BusID, decimal) -> "/dev/dri/by-path/pci-0000:0c:00.0-card".
-  # Stable across boots, unlike the /dev/dri/cardN minors (which depend on probe
-  # order, simpledrm/efifb, timing) and vary per machine for the same GPU.
-  busPath =
+  # Xorg BusID "PCI:12:0:0" (decimal) -> PCI slot "0000:0c:00.0".
+  busPci =
     busId:
     let
       p = lib.splitString ":" (lib.removePrefix "PCI:" busId);
       hex2 = n: lib.toLower (lib.fixedWidthString 2 "0" (lib.toHexString (lib.toInt n)));
     in
-    "/dev/dri/by-path/pci-0000:${hex2 (lib.elemAt p 0)}:${hex2 (lib.elemAt p 1)}.${lib.elemAt p 2}-card";
+    "0000:${hex2 (lib.elemAt p 0)}:${hex2 (lib.elemAt p 1)}.${lib.elemAt p 2}";
+
+  # aquamarine splits AQ_DRM_DEVICES on ':', but /dev/dri/by-path/pci-*-card node
+  # names are full of ':' (PCI slots), so a by-path entry gets shredded and the
+  # DRM backend finds no GPU (CBackend::create() fails, Hyprland aborts back to
+  # the greeter). The bare /dev/dri/cardN minors have no ':' but are not stable
+  # across boots (probe order, simpledrm/efifb, timing). So hyprland/nixos.nix
+  # installs a udev rule giving each GPU a stable, ':'-free alias under
+  # /dev/dri/by-canvas/; we point AQ_DRM_DEVICES at those. Keep the name in sync
+  # with that rule (both derive it from busPci).
+  aliasName = busId: lib.replaceStrings [ ":" "." ] [ "_" "_" ] (busPci busId);
 
   # Primary GPU first, then the rest. AQ_DRM_DEVICES only matters when there is
   # more than one GPU to order; a single-GPU host autodetects (robust to any minor).
   orderedGpus = (lib.filter (g: g.primary) gpus) ++ (lib.filter (g: !g.primary) gpus);
-  drmDevices = lib.concatMapStringsSep ":" (g: busPath g.busId) orderedGpus;
+  drmDevices = lib.concatMapStringsSep ":" (g: "/dev/dri/by-canvas/${aliasName g.busId}") orderedGpus;
 in
 {
   wayland.windowManager.hyprland.settings = {
