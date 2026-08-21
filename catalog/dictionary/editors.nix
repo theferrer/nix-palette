@@ -21,7 +21,9 @@
   rust-rover = {
     package = pkgs.jetbrains.rust-rover;
   };
+  # Catalog key stays `antigravity` (wants.nix references it); upstream renamed
+  # the derivation to antigravity-ide and the old name is now a warning alias.
   antigravity = {
-    package = pkgs.antigravity;
+    package = pkgs.antigravity-ide;
   };
 }
