@@ -71,13 +71,31 @@ pkgs.writeShellApplication {
     # default: Qwen's own `xhigh` overthinks simple prompts for minutes.
     effort="''${QWEN_EFFORT:-medium}"
 
-    # On a 16 GB card the weights, the MTP head and the KV cache compete for the
-    # same budget, and you can only have two of {4-bit, MTP, headroom}. So both
-    # are knobs rather than assumptions:
+    # KV cache type is the single biggest lever on generation, and not for the
+    # obvious reason. Measured on a 9070 XT at 7k context, 3 runs at temp 0:
+    #
+    #   KV      no MTP   with MTP d2
+    #   q8_0    25.11    23.55   <- speculation is a net loss
+    #   q4_0    25.45    56.89   <- speculation pays 2.24x
+    #
+    # The base rate is the same either way, so this is not KV bandwidth. The
+    # verification pass of speculative decoding reads the cache for several
+    # tokens at once, and the q8_0 attention path is expensive enough per access
+    # to eat the entire gain. Cost in quality is negligible: on 452 KB of real
+    # code, q8_0 -> q4_0 is +0.08% perplexity, where 4-bit -> 3-bit weights is
+    # +0.89%. The weights matter ~11x more than the cache.
+    kv="''${QWEN_KV:-q4_0}"
+
+    # The weights, the MTP head and the cache compete for the same 16 GB, and you
+    # get two of {4-bit, MTP, headroom} -- 4-bit plus MTP loads but spills to host
+    # RAM. Partial offload is not the escape hatch it looks like: moving 4 of 62
+    # layers to CPU measured 10.84 tok/s, the worst of the whole sweep, because a
+    # 645 GB/s card waits on DDR5 every single token.
     #   QWEN_MTP=off      free ~1.3 GiB by dropping speculative decoding
-    #   QWEN_NGL=58       leave the last layers on CPU to fit a bigger quant
-    # 4-bit is indistinguishable from BF16 where 3-bit is not, so trading some
-    # speed for it is a real option on a host with RAM to spare.
+    #   QWEN_NGL=58       leave the last layers on CPU (measured: don't)
+    # For the quality end of the trade, 4-bit without MTP holds prefill at
+    # ~1049 tok/s and drops generation to ~24:
+    #   QWEN_MODEL_FILE=Qwen3.8-27B-UD-IQ4_XS.gguf QWEN_MTP=off QWEN_KV=q8_0
     use_mtp="''${QWEN_MTP:-on}"
     ngl="''${QWEN_NGL:-999}"
 
@@ -106,7 +124,7 @@ pkgs.writeShellApplication {
       --model "$model"
       --n-gpu-layers "$ngl"
       --flash-attn on
-      --cache-type-k q8_0 --cache-type-v q8_0
+      --cache-type-k "$kv" --cache-type-v "$kv"
       --ctx-size "$ctx" --parallel 1
       # Prompt processing at the default ubatch of 512 is 5.2x slower, which is
       # what an agentic turn spends most of its wall clock on.
