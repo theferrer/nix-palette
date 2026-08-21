@@ -61,7 +61,8 @@ pkgs.writeShellApplication {
 
   text = ''
     models_dir="''${QWEN_MODEL_DIR:-$HOME/${shared.modelSubdir}}"
-    model="$models_dir/${shared.modelFile}"
+    model_file="''${QWEN_MODEL_FILE:-${shared.modelFile}}"
+    model="$models_dir/$model_file"
     mtp="$models_dir/${shared.mtpFile}"
 
     ctx="''${QWEN_CTX:-${toString shared.contextSize}}"
@@ -70,14 +71,24 @@ pkgs.writeShellApplication {
     # default: Qwen's own `xhigh` overthinks simple prompts for minutes.
     effort="''${QWEN_EFFORT:-medium}"
 
-    if [ ! -f "$model" ] || [ ! -f "$mtp" ]; then
-      echo "qwen-server: missing GGUFs in $models_dir" >&2
+    # On a 16 GB card the weights, the MTP head and the KV cache compete for the
+    # same budget, and you can only have two of {4-bit, MTP, headroom}. So both
+    # are knobs rather than assumptions:
+    #   QWEN_MTP=off      free ~1.3 GiB by dropping speculative decoding
+    #   QWEN_NGL=58       leave the last layers on CPU to fit a bigger quant
+    # 4-bit is indistinguishable from BF16 where 3-bit is not, so trading some
+    # speed for it is a real option on a host with RAM to spare.
+    use_mtp="''${QWEN_MTP:-on}"
+    ngl="''${QWEN_NGL:-999}"
+
+    if [ ! -f "$model" ]; then
+      echo "qwen-server: no $model_file in $models_dir" >&2
       echo "" >&2
-      echo "They are ~15 GB, so they are not in the Nix store. Fetch them once:" >&2
+      echo "The GGUFs are 12-16 GB, so they are not in the Nix store." >&2
       echo "" >&2
       echo "  mkdir -p $models_dir && cd $models_dir" >&2
       echo "  base=https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/main" >&2
-      echo "  curl -LO \$base/${shared.modelFile}" >&2
+      echo "  curl -LO \$base/$model_file" >&2
       echo "  curl -L -o ${shared.mtpFile} \$base/MTP/${shared.mtpFile}" >&2
       echo "" >&2
       echo "Do NOT fetch the mmproj file: it is the vision tower, useless for" >&2
@@ -85,42 +96,83 @@ pkgs.writeShellApplication {
       exit 1
     fi
 
+    if [ "$use_mtp" = on ] && [ ! -f "$mtp" ]; then
+      echo "qwen-server: MTP head missing, continuing without speculative decoding" >&2
+      echo "  (expected $mtp -- costs roughly 1.8x decode speed)" >&2
+      use_mtp=off
+    fi
+
+    args=(
+      --model "$model"
+      --n-gpu-layers "$ngl"
+      --flash-attn on
+      --cache-type-k q8_0 --cache-type-v q8_0
+      --ctx-size "$ctx" --parallel 1
+      # Prompt processing at the default ubatch of 512 is 5.2x slower, which is
+      # what an agentic turn spends most of its wall clock on.
+      --ubatch-size 1024
+      --jinja --chat-template-file ${chatTemplate}
+      --reasoning-format deepseek --reasoning-preserve
+      --chat-template-kwargs "{\"reasoning_effort\":\"$effort\"}"
+      --temp 0.6 --top-p 0.95 --top-k 20 --repeat-penalty 1.0
+      --host 127.0.0.1 --port "$port"
+      --alias ${shared.alias}
+    )
+
+    if [ "$use_mtp" = on ]; then
+      args+=(
+        --spec-draft-model "$mtp" --spec-draft-ngl "$ngl"
+        --spec-type draft-mtp --spec-draft-n-max 2
+      )
+    fi
+
     ${lib.optionalString (backend != "cuda") ''
-      # Vulkan enumerates every GPU including integrated ones, and the order is
-      # not stable, so pick the device with the most VRAM rather than an index.
-      # CUDA needs none of this: it only ever sees NVIDIA cards.
+      # Vulkan enumerates every GPU including integrated ones and the order is
+      # not stable, so the device has to be chosen by inspection. CUDA needs
+      # none of this: it only ever sees NVIDIA cards.
+      #
+      # Choose on *free* memory, not total: an integrated GPU reports a slice of
+      # system RAM as its own and can out-claim a discrete card (zeph's Arc
+      # iGPU advertises 23 GiB against the 4090's 16), which would quietly send
+      # the model to the slowest processor in the box. Known integrated and
+      # software renderers are skipped by name on top of that.
       device="''${QWEN_DEVICE:-}"
       if [ -z "$device" ]; then
-        device=$(llama-server --list-devices 2>/dev/null | gawk '
-          match($0, /^[[:space:]]+([A-Za-z0-9_]+):.*\(([0-9]+) MiB/, m) {
-            if (m[2] + 0 > best) { best = m[2] + 0; dev = m[1] }
+        pick=$(llama-server --list-devices 2>/dev/null | gawk '
+          match($0, /^[[:space:]]+([A-Za-z0-9_]+):[[:space:]]*(.+)\(([0-9]+) MiB,[[:space:]]*([0-9]+) MiB free/, m) {
+            name = m[2]; sub(/[[:space:]]+$/, "", name)
+            free = m[4] + 0
+            # Track the best of everything as a fallback, because RADV names
+            # chips it does not recognise "AMD Radeon Graphics" -- the same
+            # string an APU uses. Excluding by name alone would then throw away
+            # a brand-new discrete card and leave nothing.
+            if (free > anyfree) { anyfree = free; anydev = m[1]; anyname = name }
+            if (name ~ /llvmpipe|UHD|Iris|Intel|Radeon\(TM\) Graphics|Radeon Graphics/) next
+            if (free > best) { best = free; dev = m[1]; picked = name }
           }
-          END { if (dev != "") print dev }
+          END {
+            if (dev != "") printf "%s|%s|%d\n", dev, picked, best
+            else if (anydev != "") printf "%s|%s, unrecognised name|%d\n", anydev, anyname, anyfree
+          }
         ') || true
+        device="''${pick%%|*}"
+        if [ -n "$device" ]; then
+          rest="''${pick#*|}"
+          echo "qwen-server: using $device (''${rest%%|*}, ''${rest##*|} MiB free)" >&2
+        fi
       fi
       if [ -z "$device" ]; then
-        echo "qwen-server: no GPU device reported by llama-server" >&2
+        echo "qwen-server: no usable GPU device reported by llama-server" >&2
+        echo "  (set QWEN_DEVICE=VulkanN to force one)" >&2
         llama-server --list-devices >&2 || true
         exit 1
       fi
-      set -- --device "$device" --spec-draft-device "$device" "$@"
+      args+=( --device "$device" )
+      if [ "$use_mtp" = on ]; then
+        args+=( --spec-draft-device "$device" )
+      fi
     ''}
 
-    exec llama-server \
-      --model "$model" \
-      --n-gpu-layers 999 \
-      --spec-draft-model "$mtp" --spec-draft-ngl 999 \
-      --spec-type draft-mtp --spec-draft-n-max 2 \
-      --flash-attn on \
-      --cache-type-k q8_0 --cache-type-v q8_0 \
-      --ctx-size "$ctx" --parallel 1 \
-      --ubatch-size 1024 \
-      --jinja --chat-template-file ${chatTemplate} \
-      --reasoning-format deepseek --reasoning-preserve \
-      --chat-template-kwargs "{\"reasoning_effort\":\"$effort\"}" \
-      --temp 0.6 --top-p 0.95 --top-k 20 --repeat-penalty 1.0 \
-      --host 127.0.0.1 --port "$port" \
-      --alias ${shared.alias} \
-      "$@"
+    exec llama-server "''${args[@]}" "$@"
   '';
 }
