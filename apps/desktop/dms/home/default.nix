@@ -96,6 +96,20 @@ in
       matugenTemplateKitty = true;
       terminalsAlwaysDark = true;
 
+      # Idle timeouts, in seconds. Every one of these defaults to 0 in DMS,
+      # which means "never": as shipped this machine never blanks the panel,
+      # never locks and never idle-suspends -- only the lid and upower's 5%
+      # cutoff ever put it to sleep. On an OLED that is both the largest
+      # avoidable drain and a burn-in risk. On AC only the panel blanks;
+      # suspending a plugged-in machine out from under a long build would be
+      # worse than the power it saves.
+      acMonitorTimeout = 900;
+      acLockTimeout = 0;
+      acSuspendTimeout = 0;
+      batteryMonitorTimeout = 120;
+      batteryLockTimeout = 300;
+      batterySuspendTimeout = 900;
+
       use24HourClock = true;
       showSeconds = false;
 
