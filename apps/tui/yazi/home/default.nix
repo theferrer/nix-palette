@@ -5,7 +5,15 @@
     exiftool
     ffmpegthumbnailer
     poppler-utils
+    # Image preview picks an adapter at startup. In a terminal that speaks the
+    # kitty graphics protocol yazi draws inline and needs none of these, but
+    # when it cannot negotiate one it falls back to the X11/Wayland overlay
+    # adapter (ueberzugpp) and then to chafa's unicode blocks. Without either
+    # installed that chain dead-ends and images render as bare metadata, which
+    # reads like a broken previewer rather than a missing dependency.
+    ueberzugpp
     chafa
+    imagemagick
     glow
     jless
     hexyl
@@ -22,7 +30,13 @@
     enableZshIntegration = config.programs.zsh.enable;
 
     settings = {
-      manager = {
+      # Schema notes for yazi >= 25.5: this table was `manager`, openers took
+      # `exec` rather than `run`, and open rules matched on `name` instead of
+      # `url`. Only the last one is a hard parse error; the other two fail
+      # silently, so the config looks fine while every setting in it is
+      # ignored. If yazi ever prints "continue with preset settings" on
+      # startup, that is this file failing to parse, not a broken install.
+      mgr = {
         layout = [
           1
           4
@@ -41,39 +55,38 @@
         tab_size = 2;
         max_width = 600;
         max_height = 900;
-        cache_dir = "";
       };
 
       opener = {
         edit = [
           {
-            exec = ''$EDITOR "$@"'';
+            run = ''$EDITOR "$@"'';
             block = true;
             for = "unix";
           }
         ];
         open = [
           {
-            exec = ''xdg-open "$@"'';
+            run = ''xdg-open "$@"'';
             desc = "Open";
           }
         ];
         reveal = [
           {
-            exec = ''nemo "$@"'';
+            run = ''nemo "$@"'';
             desc = "Reveal";
             for = "linux";
           }
         ];
         extract = [
           {
-            exec = ''unar "$1"'';
+            run = ''unar "$1"'';
             desc = "Extract here";
           }
         ];
         play = [
           {
-            exec = ''mpv "$@"'';
+            run = ''mpv "$@"'';
             orphan = true;
             for = "unix";
           }
@@ -83,7 +96,7 @@
       open = {
         rules = [
           {
-            name = "*/";
+            url = "*/";
             use = [
               "edit"
               "open"
@@ -189,7 +202,7 @@
             ];
           }
           {
-            name = "*";
+            url = "*";
             use = [
               "open"
               "reveal"
