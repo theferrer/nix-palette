@@ -230,7 +230,9 @@
   lshw.package = pkgs.lshw;
   fuse.package = pkgs.fuse;
   xdg-user-dirs.package = pkgs.xdg-user-dirs;
-  cpupower.package = pkgs.linuxPackages.cpupower;
+  # linuxPackages is the LTS set; every host here runs linuxPackages_latest,
+  # and cpupower talks to the kernel it was built against.
+  cpupower.package = pkgs.linuxPackages_latest.cpupower;
   undervolt.package = pkgs.undervolt;
   tpm2-pkcs11.package = pkgs.tpm2-pkcs11;
   unar.package = pkgs.unar;
