@@ -28,7 +28,13 @@
       "fadeLayersOut, 1, 3, smoothOut"
 
       "border, 1, 10, softAcDecel"
-      "borderangle, 1, 100, softAcDecel, loop"
+      # borderangle stays off. It only animates gradient borders, and the
+      # theme sets col.active_border to a solid colour, so it renders
+      # nothing -- while still repainting every frame forever. Measured on
+      # an idle desktop: 13% of a core in Hyprland plus 9% in the i915
+      # kworker. It also keeps the display engine awake, which blocks PSR,
+      # FBC and the package C-states from ever engaging.
+      "borderangle, 0"
 
       "workspaces, 1, 4, overshot, slide"
       "specialWorkspace, 1, 4, md2, slidevert"

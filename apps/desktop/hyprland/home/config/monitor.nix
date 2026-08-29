@@ -2,7 +2,6 @@
   config,
   lib,
   osConfig ? null,
-  pkgs,
   ...
 }:
 let
@@ -33,30 +32,13 @@ in
 
     monitor = (map mkMonitorString monitors) ++ [ ",preferred,auto,1" ];
 
-    exec-once = [
-      ''
-        ${pkgs.writeShellScript "monitor-handler" ''
-          #!/usr/bin/env bash
-
-          fix_workspaces() {
-            for i in {1..10}; do
-              hyprctl dispatch moveworkspacetomonitor "$i" "$(hyprctl monitors -j | jq -r '.[0].name')"
-            done
-          }
-
-          while true; do
-            hyprctl monitors -j | jq -r '.[].name' > /tmp/current_monitors
-            sleep 2
-            hyprctl monitors -j | jq -r '.[].name' > /tmp/new_monitors
-
-            if ! diff -q /tmp/current_monitors /tmp/new_monitors > /dev/null; then
-              echo "Monitor configuration changed, fixing workspaces..."
-              fix_workspaces
-            fi
-          done
-        ''}
-      ''
-    ];
+    # No monitor-watching loop here. There used to be a shell script polling
+    # `hyprctl monitors` every 2s into fixed /tmp paths and firing ten
+    # moveworkspacetomonitor dispatches on any change -- which meant it also
+    # fired during lid open and resume, racing the compositor while it was
+    # still bringing the output back. Hyprland reapplies the monitor= rules on
+    # reconnect by itself, and the SUPER CTRL R bind below re-herds workspaces
+    # on demand when a hotplug leaves them somewhere unhelpful.
 
     bind = lib.optionals hasMonitors [
       "SUPER CTRL, R, exec, hyprctl dispatch moveworkspacetomonitor 1 ${firstName} && hyprctl dispatch moveworkspacetomonitor 2 ${firstName} && hyprctl dispatch moveworkspacetomonitor 3 ${firstName}"

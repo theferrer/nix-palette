@@ -61,6 +61,6 @@ in
         "AQ_DRM_DEVICES,${drmDevices}"
       ];
 
-    debug.disable_logs = false;
+    debug.disable_logs = true;
   };
 }
