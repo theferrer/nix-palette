@@ -1,12 +1,45 @@
 {
   config,
   lib,
+  pkgs,
   osConfig ? null,
   ...
 }:
 let
   inherit (lib.lists) optionals;
   inherit (builtins) toString genList concatLists;
+
+  # brightnessctl with no -d takes whichever device it enumerates first. On a
+  # hybrid-graphics laptop that is the phantom nvidia_0 node the proprietary
+  # driver hangs off the dGPU: writing to it moves a counter and nothing else,
+  # so the brightness keys look dead while the panel's real device sits
+  # untouched. NVreg_RegistryDwords=EnableBrightnessControl=0 does not stop the
+  # node from being created, so pick the right device rather than suppress the
+  # wrong one. Panel backlights are type "raw"; acpi_video* is "firmware" and
+  # is usually the one that does nothing, hence the two-pass preference.
+  brightness = pkgs.writeShellApplication {
+    name = "canvas-brightness";
+    runtimeInputs = [ pkgs.brightnessctl ];
+    text = ''
+      pick() {
+        for d in /sys/class/backlight/*; do
+          [ -e "$d/type" ] || continue
+          case "$(basename "$d")" in nvidia_*) continue ;; esac
+          [ -n "$1" ] && [ "$(cat "$d/type")" != "$1" ] && continue
+          basename "$d"
+          return 0
+        done
+        return 1
+      }
+
+      dev=$(pick raw || pick "" || true)
+
+      if [ -n "$dev" ]; then
+        exec brightnessctl -d "$dev" set "$1" -q
+      fi
+      exec brightnessctl set "$1" -q
+    '';
+  };
 
   conf = if osConfig != null then osConfig else config;
   inherit (conf.canvas) resolved;
@@ -109,8 +142,8 @@ in
     binde = [
       ", XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"
       ", XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
-      ", XF86MonBrightnessUp, exec, brightnessctl set 5%+ -q"
-      ", XF86MonBrightnessDown, exec, brightnessctl set 5%- -q"
+      ", XF86MonBrightnessUp, exec, ${lib.getExe brightness} 5%+"
+      ", XF86MonBrightnessDown, exec, ${lib.getExe brightness} 5%-"
     ];
   };
 }
