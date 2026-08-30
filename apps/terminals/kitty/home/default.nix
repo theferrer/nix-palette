@@ -1,5 +1,54 @@
-{ config, ... }:
 {
+  config,
+  pkgs,
+  ...
+}:
+let
+  # Claude Code runs in a tmux on another machine, and the way in for an image
+  # is a file path, not a paste: a paste over a PTY carries text, and the
+  # terminal's own image handling needs the *local* terminal to hand over the
+  # data, which it cannot do when the program is on the far end of an SSH
+  # connection. kitty's OSC 5522 clipboard kitten does not rescue this either
+  # -- that protocol is two-way, so a multiplexer has to implement it to route
+  # the reply back to the right pane, and tmux does not.
+  #
+  # So push instead of pull: take the image off this machine's clipboard and
+  # write it where the remote session can read it. Overwrites a fixed name so
+  # a static key binding can type the path.
+  clipboard-image-to = pkgs.writeShellApplication {
+    name = "clipboard-image-to";
+    runtimeInputs = with pkgs; [
+      wl-clipboard
+      openssh
+      libnotify
+    ];
+    text = ''
+      host="''${1:?usage: clipboard-image-to <host> [remote-path]}"
+      remote="''${2:-inbox/latest.png}"
+
+      if ! wl-paste --list-types 2>/dev/null | grep -q '^image/'; then
+        notify-send -u critical "clipboard-image-to" "No image on the clipboard"
+        exit 1
+      fi
+
+      # Both remote commands interpolate $remote on this side deliberately --
+      # the path is chosen here, not there. Splitting mkdir from the write
+      # keeps the quoting legible; with ControlMaster the second call reuses
+      # the first one's connection and costs nothing.
+      # shellcheck disable=SC2029
+      if ssh "$host" "mkdir -p \"\$(dirname '$remote')\"" \
+        && wl-paste --type image/png | ssh "$host" "cat > '$remote'"; then
+        notify-send "clipboard-image-to" "Sent to $host:$remote"
+      else
+        notify-send -u critical "clipboard-image-to" "Failed to send to $host"
+        exit 1
+      fi
+    '';
+  };
+in
+{
+  home.packages = [ clipboard-image-to ];
+
   programs.kitty = {
     enable = true;
 
