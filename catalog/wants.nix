@@ -350,6 +350,7 @@
     software = [
       "wl-ocr"
       "hyprshot"
+      "screenrec"
       "hyprpicker"
       "swappy"
       "wl-clipboard"

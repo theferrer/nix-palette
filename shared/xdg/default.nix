@@ -167,6 +167,7 @@ in
 
       extraConfig = {
         SCREENSHOTS = "${config.xdg.userDirs.pictures}/screenshots";
+        RECORDINGS = "${config.xdg.userDirs.videos}/recordings";
         DEV = "${config.home.homeDirectory}/dev";
       };
     };

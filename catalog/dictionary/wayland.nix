@@ -76,4 +76,5 @@
     package = pkgs.wl-clip-persist;
   };
   wl-ocr.package = pkgs.wl-ocr;
+  screenrec.package = pkgs.screenrec;
 }
