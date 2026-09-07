@@ -90,9 +90,9 @@ in
       "${mod} SHIFT, W, exec, hyprshot -m window --silent"
       "${mod} SHIFT, M, exec, hyprshot -m output --silent"
 
-      "${mod}, Print, exec, screenrec region"
-      "${mod} SHIFT, Print, exec, screenrec screen"
-      "${mod} ALT, Print, exec, screenrec region --audio"
+      "${mod} ALT, R, exec, screenrec region"
+      "${mod} ALT, M, exec, screenrec screen"
+      "${mod} ALT, A, exec, screenrec region --audio"
 
       "${mod} SHIFT, P, exec, hyprpicker -a -f hex"
 
