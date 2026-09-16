@@ -180,7 +180,6 @@
       "pgcli"
       "harlequin"
       "lazysql"
-      "beekeeper-studio"
       "mods"
       "aichat"
       "tgpt"

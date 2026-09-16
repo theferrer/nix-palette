@@ -201,6 +201,10 @@
   pgcli.package = pkgs.pgcli;
   harlequin.package = pkgs.harlequin;
   lazysql.package = pkgs.lazysql;
+  # Not in the dev-tools want: nixpkgs marks it insecure (Electron 39.8.1, EOL
+  # March 2026), so pulling it in would fail evaluation on every host. Still
+  # here so a host that wants it can take it through canvas.extra and permit
+  # the insecure build itself.
   beekeeper-studio.package = pkgs.beekeeper-studio;
 
   # Data wrangling and misc
