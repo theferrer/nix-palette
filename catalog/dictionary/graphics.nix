@@ -1,5 +1,12 @@
 { pkgs }:
 {
+  # Unfree (Igara Studio's EULA), so it is never in the binary cache: the EULA
+  # lets you compile it for personal use but not redistribute the build. Skia
+  # is cached, so only Aseprite itself compiles locally.
+  aseprite = {
+    package = pkgs.aseprite;
+  };
+
   blender = {
     package = pkgs.blender;
   };
