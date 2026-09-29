@@ -122,6 +122,11 @@
   claude-code = {
     package = pkgs.claude-code;
   };
+  # nixpkgs wraps it with its own Chromium (PLAYWRIGHT_BROWSERS_PATH), which is
+  # what makes it work on NixOS at all: Playwright's downloaded browsers do not.
+  playwright-mcp = {
+    package = pkgs.playwright-mcp;
+  };
   opencode = {
     package = pkgs.opencode;
   };

@@ -286,6 +286,28 @@
     ];
   };
 
+  # Opt-in: most of it is heavy (ComfyUI builds a multi-GB venv on first run,
+  # Aseprite compiles locally). Add "game-art" to a host's wants.
+  game-art = {
+    description = "Agent-driven game art: Aseprite, Blender and ComfyUI with their MCP bridges, sprite tooling and browser QA.";
+    software = [
+      "aseprite"
+      "aseprite-mcp"
+      "blender"
+      "mcp-for-blender"
+      "comfyui"
+      "ffmpeg"
+      "imagemagick"
+      "gifski"
+      "oxipng"
+      "pngquant"
+      "rembg"
+      "ktx-tools"
+      "meshoptimizer"
+      "playwright-mcp"
+    ];
+  };
+
   sync-net = {
     description = "Sync, torrent and VPN clients.";
     software = [
