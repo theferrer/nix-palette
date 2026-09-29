@@ -305,6 +305,7 @@
       "ktx-tools"
       "meshoptimizer"
       "playwright-mcp"
+      "game-art-init"
     ];
   };
 

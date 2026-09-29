@@ -16,6 +16,8 @@
   # a live Blender, started with its add-on by the `blender-mcp` it also ships.
   aseprite-mcp.package = pkgs.aseprite-mcp;
   mcp-for-blender.package = pkgs.mcp-for-blender;
+  # Writes the three servers into a project's .mcp.json.
+  game-art-init.package = pkgs.game-art-init;
 
   # Sprite and texture post-processing: GIF previews, lossless PNG shrinking,
   # palette quantisation, background removal, and GPU texture / glTF packing
