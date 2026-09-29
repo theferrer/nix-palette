@@ -1,0 +1,49 @@
+{
+  "unet": {
+    "class_type": "UNETLoader",
+    "inputs": { "unet_name": "z_image_turbo_bf16.safetensors", "weight_dtype": "default" }
+  },
+  "lora": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": { "model": ["unet", 0], "lora_name": "pixel_art_style_z_image_turbo.safetensors", "strength_model": 1.0 }
+  },
+  "sampling": {
+    "class_type": "ModelSamplingAuraFlow",
+    "inputs": { "model": ["lora", 0], "shift": 3 }
+  },
+  "clip": {
+    "class_type": "CLIPLoader",
+    "inputs": { "clip_name": "qwen_3_4b.safetensors", "type": "lumina2", "device": "default" }
+  },
+  "vae": {
+    "class_type": "VAELoader",
+    "inputs": { "vae_name": "ae.safetensors" }
+  },
+  "prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": { "clip": ["clip", 0], "text": "Pixel art style. A cyberpunk courier standing in the rain, full body, side view, neon signs, plain dark background." }
+  },
+  "negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": { "conditioning": ["prompt", 0] }
+  },
+  "latent": {
+    "class_type": "EmptySD3LatentImage",
+    "inputs": { "width": 1024, "height": 1024, "batch_size": 1 }
+  },
+  "sampler": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": ["sampling", 0], "positive": ["prompt", 0], "negative": ["negative", 0], "latent_image": ["latent", 0],
+      "seed": 0, "steps": 8, "cfg": 1, "sampler_name": "res_multistep", "scheduler": "simple", "denoise": 1
+    }
+  },
+  "decode": {
+    "class_type": "VAEDecode",
+    "inputs": { "samples": ["sampler", 0], "vae": ["vae", 0] }
+  },
+  "save": {
+    "class_type": "SaveImage",
+    "inputs": { "images": ["decode", 0], "filename_prefix": "z-image-pixel-art" }
+  }
+}

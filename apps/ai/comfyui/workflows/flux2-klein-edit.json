@@ -1,0 +1,78 @@
+{
+  "reference": {
+    "class_type": "LoadImage",
+    "inputs": { "image": "reference.png" }
+  },
+  "scaled": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": { "image": ["reference", 0], "upscale_method": "nearest-exact", "megapixels": 1, "resolution_steps": 1 }
+  },
+  "size": {
+    "class_type": "GetImageSize",
+    "inputs": { "image": ["scaled", 0] }
+  },
+  "unet": {
+    "class_type": "UNETLoader",
+    "inputs": { "unet_name": "flux-2-klein-4b.safetensors", "weight_dtype": "default" }
+  },
+  "clip": {
+    "class_type": "CLIPLoader",
+    "inputs": { "clip_name": "qwen_3_4b.safetensors", "type": "flux2", "device": "default" }
+  },
+  "vae": {
+    "class_type": "VAELoader",
+    "inputs": { "vae_name": "flux2-vae.safetensors" }
+  },
+  "prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": { "clip": ["clip", 0], "text": "Same character, same outfit and colours, now walking to the right, mid-stride." }
+  },
+  "empty": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": { "conditioning": ["prompt", 0] }
+  },
+  "encoded": {
+    "class_type": "VAEEncode",
+    "inputs": { "pixels": ["scaled", 0], "vae": ["vae", 0] }
+  },
+  "positive": {
+    "class_type": "ReferenceLatent",
+    "inputs": { "conditioning": ["prompt", 0], "latent": ["encoded", 0] }
+  },
+  "negative": {
+    "class_type": "ReferenceLatent",
+    "inputs": { "conditioning": ["empty", 0], "latent": ["encoded", 0] }
+  },
+  "guider": {
+    "class_type": "CFGGuider",
+    "inputs": { "model": ["unet", 0], "positive": ["positive", 0], "negative": ["negative", 0], "cfg": 1 }
+  },
+  "noise": {
+    "class_type": "RandomNoise",
+    "inputs": { "noise_seed": 0 }
+  },
+  "sampler": {
+    "class_type": "KSamplerSelect",
+    "inputs": { "sampler_name": "euler" }
+  },
+  "sigmas": {
+    "class_type": "Flux2Scheduler",
+    "inputs": { "steps": 4, "width": ["size", 0], "height": ["size", 1] }
+  },
+  "latent": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": { "width": ["size", 0], "height": ["size", 1], "batch_size": 1 }
+  },
+  "sample": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": { "noise": ["noise", 0], "guider": ["guider", 0], "sampler": ["sampler", 0], "sigmas": ["sigmas", 0], "latent_image": ["latent", 0] }
+  },
+  "decode": {
+    "class_type": "VAEDecode",
+    "inputs": { "samples": ["sample", 0], "vae": ["vae", 0] }
+  },
+  "save": {
+    "class_type": "SaveImage",
+    "inputs": { "images": ["decode", 0], "filename_prefix": "flux2-klein-edit" }
+  }
+}
