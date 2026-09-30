@@ -1,8 +1,9 @@
 # `game-art-init`: sets up the current project for the game-art tools:
 #
 #   .mcp.json              the aseprite, blender and playwright MCP servers
-#   .claude/settings.json  enables pixel-plugin (its marketplace is registered
-#                          for every session by the palette's pixel-plugin app)
+#   .claude/settings.json  enables pixel-plugin, and codex-imagegen when asked
+#                          for (both marketplaces are registered for every
+#                          session by the palette's apps of the same name)
 #
 # Project-scoped, so none of it loads in sessions that have nothing to do with
 # art. Servers are referenced by command name, not store path: the files are
@@ -17,14 +18,18 @@ writeShellApplication {
   name = "game-art-init";
   runtimeInputs = [ jq ];
   text = ''
+    # imagegen is not in the default set: its skill generates images for any
+    # build task without asking, including the sprites the Blender pipeline is
+    # there to keep consistent. It has to be named.
     all=(aseprite blender playwright pixel)
 
     usage() {
-      echo "usage: game-art-init [--force] [aseprite|blender|playwright|pixel]..."
+      echo "usage: game-art-init [--force] [aseprite|blender|playwright|pixel|imagegen]..."
       echo
       echo "Sets up this project (default: ''${all[*]}):"
       echo "  aseprite, blender, playwright  MCP servers, in ./.mcp.json"
       echo "  pixel                          pixel-plugin, enabled in ./.claude/settings.json"
+      echo "  imagegen                       codex-imagegen, likewise; opt-in, never by default"
       echo "Entries already present are left alone unless --force is given."
     }
 
@@ -34,7 +39,7 @@ writeShellApplication {
       case "$arg" in
         -h | --help) usage; exit 0 ;;
         -f | --force) force=1 ;;
-        aseprite | blender | playwright | pixel) wanted+=("$arg") ;;
+        aseprite | blender | playwright | pixel | imagegen) wanted+=("$arg") ;;
         *) echo "game-art-init: unknown item '$arg'" >&2; usage >&2; exit 1 ;;
       esac
     done
@@ -82,13 +87,16 @@ writeShellApplication {
       *" aseprite "* | *" blender "* | *" playwright "*) mcp_config=$(load "$mcp") || exit 1 ;;
     esac
     case " ''${wanted[*]} " in
-      *" pixel "*) settings_config=$(load "$settings") || exit 1 ;;
+      *" pixel "* | *" imagegen "*) settings_config=$(load "$settings") || exit 1 ;;
     esac
 
     for item in "''${wanted[@]}"; do
       case "$item" in
         pixel)
           settings_config=$(set_entry "$settings_config" '.enabledPlugins["pixel-plugin@pixel-plugin"]' true "pixel-plugin" "$settings")
+          ;;
+        imagegen)
+          settings_config=$(set_entry "$settings_config" '.enabledPlugins["imagegen@imagegen-marketplace"]' true "codex-imagegen" "$settings")
           ;;
         *)
           mcp_config=$(set_entry "$mcp_config" ".mcpServers[\"$item\"]" "$(definition "$item")" "$item" "$mcp")
@@ -109,7 +117,10 @@ writeShellApplication {
     case " ''${wanted[*]} " in
       *" blender "*) echo "The blender server needs a running Blender: start it with 'blender-mcp'." ;;
     esac
+    case " ''${wanted[*]} " in
+      *" imagegen "*) echo "codex-imagegen uses your ChatGPT plan through 'codex'; check it with 'codex login status'." ;;
+    esac
   '';
 
-  meta.description = "Set up the current project's MCP servers and pixel-plugin for the game-art tools";
+  meta.description = "Set up the current project's MCP servers and Claude Code plugins for the game-art tools";
 }

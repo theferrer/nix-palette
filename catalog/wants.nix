@@ -307,6 +307,8 @@
       "playwright-mcp"
       "game-art-init"
       "pixel-plugin"
+      "codex-imagegen"
+      "codex"
     ];
   };
 
