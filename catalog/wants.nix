@@ -306,6 +306,7 @@
       "meshoptimizer"
       "playwright-mcp"
       "game-art-init"
+      "pixel-plugin"
     ];
   };
 
