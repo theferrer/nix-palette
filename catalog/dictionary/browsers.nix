@@ -1,9 +1,7 @@
 { pkgs }:
 {
-  chrome = {
-    package = pkgs.google-chrome;
-    provides = [ "browser" ];
-  };
+  # Alias of apps/browsers/google-chrome, so both names get its WebGPU flags.
+  chrome = import ../../apps/browsers/google-chrome/entry.nix { inherit pkgs; };
 
   edge = {
     package = pkgs.microsoft-edge;

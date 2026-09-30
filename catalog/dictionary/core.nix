@@ -14,10 +14,6 @@
     provides = [ "terminal" ];
   };
 
-  google-chrome = {
-    package = pkgs.google-chrome;
-    provides = [ "browser" ];
-  };
   brave = {
     package = pkgs.brave;
     provides = [ "browser" ];
