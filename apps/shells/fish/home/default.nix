@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 {
   programs.fish = {
     enable = true;
@@ -39,9 +39,11 @@
   home.shellAliases = {
     mkdir = "mkdir -pv";
     df = "df -h";
+    lg = "lazygit";
+  }
+  // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
     rs = "systemctl reboot";
     sysctl = "sudo systemctl";
     jctl = "journalctl -p 3 -xb";
-    lg = "lazygit";
   };
 }

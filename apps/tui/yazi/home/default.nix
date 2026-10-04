@@ -1,25 +1,35 @@
-{ config, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
 
-  home.packages = with pkgs; [
-    exiftool
-    ffmpegthumbnailer
-    poppler-utils
-    # Image preview picks an adapter at startup. In a terminal that speaks the
-    # kitty graphics protocol yazi draws inline and needs none of these, but
-    # when it cannot negotiate one it falls back to the X11/Wayland overlay
-    # adapter (ueberzugpp) and then to chafa's unicode blocks. Without either
-    # installed that chain dead-ends and images render as bare metadata, which
-    # reads like a broken previewer rather than a missing dependency.
-    ueberzugpp
-    chafa
-    imagemagick
-    glow
-    jless
-    hexyl
-    fontpreview
-    unar
-  ];
+  home.packages =
+    with pkgs;
+    [
+      exiftool
+      ffmpegthumbnailer
+      poppler-utils
+      # Image preview picks an adapter at startup. In a terminal that speaks the
+      # kitty graphics protocol yazi draws inline and needs none of these, but
+      # when it cannot negotiate one it falls back to the X11/Wayland overlay
+      # adapter (ueberzugpp) and then to chafa's unicode blocks. Without either
+      # installed that chain dead-ends and images render as bare metadata, which
+      # reads like a broken previewer rather than a missing dependency.
+      chafa
+      imagemagick
+      glow
+      jless
+      hexyl
+      unar
+    ]
+    # ueberzugpp is the X11/Wayland overlay; fontpreview previews through sxiv.
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+      ueberzugpp
+      fontpreview
+    ];
 
   programs.yazi = {
     enable = true;

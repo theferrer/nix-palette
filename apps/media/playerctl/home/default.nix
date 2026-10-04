@@ -1,5 +1,6 @@
 { pkgs, ... }:
 {
   home.packages = [ pkgs.playerctl ];
-  services.playerctld.enable = true;
+  # The binary builds on macOS too, but there is no MPRIS to daemonise for.
+  services.playerctld.enable = pkgs.stdenv.hostPlatform.isLinux;
 }

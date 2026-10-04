@@ -54,6 +54,10 @@ let
           swww img "$wp" || true
         elif command -v feh > /dev/null; then
           feh --bg-fill "$wp" || true
+        elif command -v osascript > /dev/null; then
+          # Finder caches by path, and the link's path never changes; hand it
+          # the store file behind it so a switch actually repaints.
+          osascript -e "tell application \"System Events\" to tell every desktop to set picture to \"$(readlink -f "$wp")\"" || true
         fi
       fi
 

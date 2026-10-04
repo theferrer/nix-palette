@@ -9,11 +9,17 @@
   #
   # Chrome keeps only the last --enable-features, and the nixpkgs wrapper puts
   # its Wayland one before these, so it has to be repeated here.
-  package = pkgs.google-chrome.override {
-    commandLineArgs = builtins.concatStringsSep " " [
-      "--enable-features=Vulkan,WaylandWindowDecorations"
-      "--use-webgpu-power-preference=default-low-power"
-    ];
-  };
+  #
+  # macOS has Metal under Dawn and no wrapper to pass flags through.
+  package =
+    if pkgs.stdenv.hostPlatform.isDarwin then
+      pkgs.google-chrome
+    else
+      pkgs.google-chrome.override {
+        commandLineArgs = builtins.concatStringsSep " " [
+          "--enable-features=Vulkan,WaylandWindowDecorations"
+          "--use-webgpu-power-preference=default-low-power"
+        ];
+      };
   provides = [ "browser" ];
 }

@@ -17,7 +17,13 @@ in
     enableZshIntegration = config.programs.zsh.enable;
     enableNushellIntegration = config.programs.nushell.enable;
 
-    pinentry.package = if graphical then pkgs.pinentry-gnome3 else pkgs.pinentry-curses;
+    pinentry.package =
+      if pkgs.stdenv.hostPlatform.isDarwin then
+        pkgs.pinentry_mac
+      else if graphical then
+        pkgs.pinentry-gnome3
+      else
+        pkgs.pinentry-curses;
     enableScDaemon = true;
     enableSshSupport = true;
     defaultCacheTtl = 1209600;
@@ -27,7 +33,9 @@ in
     extraConfig = "allow-preset-passphrase";
   };
 
-  systemd.user.services.gpg-agent.Unit.RefuseManualStart = lib.mkForce false;
+  systemd.user.services.gpg-agent.Unit.RefuseManualStart = lib.mkIf pkgs.stdenv.hostPlatform.isLinux (
+    lib.mkForce false
+  );
 
   programs.gpg = {
     enable = true;

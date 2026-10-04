@@ -31,7 +31,7 @@ let
   };
 
 in
-lib.mkIf (graphical && gui != null) {
+lib.mkIf (graphical && gui != null && pkgs.stdenv.hostPlatform.isLinux) {
   home = {
     pointerCursor = {
       enable = true;
