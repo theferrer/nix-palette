@@ -3,6 +3,7 @@
   lib,
   canvas,
   home-manager,
+  nix-darwin,
   dmsModule,
   nixvimModule,
   commaModule,
@@ -45,6 +46,18 @@ in
         canvas
         home-manager
         dmsModule
+        nixvimModule
+        commaModule
+        ;
+    }
+  );
+  darwin = runSuite "darwin" (
+    import ./darwin.nix {
+      inherit
+        lib
+        canvas
+        home-manager
+        nix-darwin
         nixvimModule
         commaModule
         ;

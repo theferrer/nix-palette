@@ -18,6 +18,10 @@
 
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
+    # Only the darwin smoke test uses it; consumers bring their own.
+    nix-darwin.url = "github:nix-darwin/nix-darwin";
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -28,6 +32,7 @@
       nixvim,
       nix-index-database,
       home-manager,
+      nix-darwin,
       ...
     }:
     let
@@ -57,6 +62,7 @@
     in
     {
       nixosModules.default = import ./modules/nixos.nix flakeModules;
+      darwinModules.default = import ./modules/darwin.nix flakeModules;
 
       overlays.default = import ./overlays;
 
@@ -76,6 +82,7 @@
             lib
             canvas
             home-manager
+            nix-darwin
             ;
           inherit (flakeModules) dmsModule nixvimModule commaModule;
         })
