@@ -649,6 +649,26 @@
     ];
   };
 
+  # The desktop want minus what Aqua already is: no login manager, bar,
+  # launcher, lock or Wayland utilities. Linux-only members of the included
+  # suites drop out on their own (see catalog/default.nix).
+  mac-desktop = {
+    description = "Daily-driver macOS session: tiling, terminal, browser and desktop apps.";
+    capabilities = [
+      "desktop"
+      "terminal"
+      "browser"
+    ];
+    includes = [
+      "media-suite"
+      "office-suite"
+      "comms"
+      "archivers"
+      "sync-net"
+      "desktop-utils"
+    ];
+  };
+
   development = {
     description = "Write, build and ship code.";
     capabilities = [

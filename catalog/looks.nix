@@ -23,6 +23,20 @@
     style = "synthppuccin";
   };
 
+  # neon's look on macOS: the same terminal, editor, shell and theme, with
+  # AeroSpace in Hyprland's place. Aqua keeps the bar, launcher, notifications
+  # and lock, so those capabilities are left unadjudicated.
+  neon-mac = {
+    use = {
+      desktop = "aerospace";
+      terminal = "kitty";
+      editor = "nvim";
+      browser = "chrome";
+      shell = "fish";
+    };
+    style = "synthppuccin";
+  };
+
   mono = {
     use = {
       editor = "nvim";
