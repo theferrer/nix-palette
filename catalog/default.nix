@@ -57,54 +57,96 @@ let
     )
   ) { } appList;
 
-  software = mergeChecked "apps/" dictionary appEntries // {
+  # Wants are written once for every platform, so on darwin an entry whose
+  # package nixpkgs cannot build there is kept but emptied: the want still
+  # resolves, the host just gets nothing for it. Its home module goes too,
+  # since it would configure a program that is not installed. Linux keeps the
+  # catalog untouched -- a package missing there is a bug worth seeing.
+  #
+  # meta.platforms alone is not enough: plenty of packages claim "unix" and
+  # then pull glibc or systemd somewhere in their closure. Instantiating the
+  # derivation is what surfaces that, and nixpkgs reports it with a throw,
+  # which tryEval catches.
+  availableHere =
+    e:
+    let
+      ok = builtins.tryEval (
+        let
+          p = e.package or null;
+        in
+        p == null || builtins.seq p.drvPath true
+      );
+    in
+    ok.success && ok.value;
 
-    comma = appEntries.comma // {
-      homeModule =
-        if commaModule == null then
-          null
+  forPlatform =
+    entries:
+    if !pkgs.stdenv.hostPlatform.isDarwin then
+      entries
+    else
+      lib.mapAttrs (
+        _: e:
+        if availableHere e then
+          e
         else
-          {
-            imports = [
-              commaModule
-              (appDir "comma" + "/home")
-            ];
-          };
-    };
+          e
+          // {
+            package = null;
+            homeModule = null;
+          }
+      ) entries;
 
-    nvim = appEntries.nvim // {
-      homeModule =
-        if nixvimModule == null then
-          null
-        else
-          {
-            imports = [
-              nixvimModule
-              (appDir "nvim" + "/home")
-            ];
-          };
-    };
+  software = forPlatform (
+    mergeChecked "apps/" dictionary appEntries
+    // {
 
-    dms = {
-      provides = [
-        "bar"
-        "notifications"
-        "launcher"
-        "screen-locker"
-      ];
-      description = "DankMaterialShell: bar, notifications, launcher, clipboard, lock, idle and matugen theming in one shell.";
-      homeModule =
-        if dmsModule == null then
-          null
-        else
-          {
-            imports = [
-              dmsModule
-              (appDir "dms" + "/home")
-            ];
-          };
-    };
-  };
+      comma = appEntries.comma // {
+        homeModule =
+          if commaModule == null then
+            null
+          else
+            {
+              imports = [
+                commaModule
+                (appDir "comma" + "/home")
+              ];
+            };
+      };
+
+      nvim = appEntries.nvim // {
+        homeModule =
+          if nixvimModule == null then
+            null
+          else
+            {
+              imports = [
+                nixvimModule
+                (appDir "nvim" + "/home")
+              ];
+            };
+      };
+
+      dms = {
+        provides = [
+          "bar"
+          "notifications"
+          "launcher"
+          "screen-locker"
+        ];
+        description = "DankMaterialShell: bar, notifications, launcher, clipboard, lock, idle and matugen theming in one shell.";
+        homeModule =
+          if dmsModule == null then
+            null
+          else
+            {
+              imports = [
+                dmsModule
+                (appDir "dms" + "/home")
+              ];
+            };
+      };
+    }
+  );
 in
 {
   schemaVersion = 1;
